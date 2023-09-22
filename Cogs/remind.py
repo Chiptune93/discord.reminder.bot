@@ -7,6 +7,7 @@ import random
 
 target_channel = os.getenv('DISCORD_REMIND_CHANNEL')
 
+
 class Remind(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -19,7 +20,8 @@ class Remind(commands.Cog):
 
         # 오전 9시 ~ 오후 9시 사이에만 실행한다.
         print(f'현재 시간 : {dt}')
-        if (dt.hour == 9 and dt.minute >= 0 and dt.second >= 0) and (dt.hour < 22 and dt.minute <= 59 and dt.second <= 59):
+        if (dt.hour == 9 and dt.minute >= 0 and dt.second >= 0) and (
+                dt.hour < 22 and dt.minute <= 59 and dt.second <= 59):
 
             for channel_id in self.channels:
                 try:
