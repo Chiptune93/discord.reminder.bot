@@ -5,9 +5,10 @@ from dotenv import load_dotenv
 import pytz
 import requests
 import random
+import ast
 
-# 채널 정보를 환경 변수에서 세팅
-target_channel = os.getenv('DISCORD_REMIND_CHANNEL')
+# 채널 정보를 환경 변수에서 세팅 (스트링 배열 -> int 배열)
+target_channel = ast.literal_eval(os.getenv('DISCORD_REMIND_CHANNEL'))
 
 
 # Cog 클래스
@@ -15,7 +16,7 @@ class Remind(commands.Cog):
     # 생성자, 봇을 받아 초기화함.
     def __init__(self, bot):
         self.bot = bot
-        self.channels = [target_channel]  # 채널 ID 리스트로 변경
+        self.channels = target_channel  # 채널 ID 리스트로 변경
 
     # 반복 작업 구문
     @tasks.loop(minutes=60)  # 매 1시간 마다 반복.
@@ -26,10 +27,11 @@ class Remind(commands.Cog):
 
         # 오전 9시 ~ 오후 9시 사이에만 실행한다.
         print(f'현재 시간 : {dt} -> {dt.hour} : {dt.minute} : {dt.second}')
-        if (dt.hour == 9 and dt.minute >= 0 and dt.second >= 0) and (
+        if (dt.hour >= 9 and dt.minute >= 0 and dt.second >= 0) and (
                 dt.hour < 22 and dt.minute <= 59 and dt.second <= 59):
 
             for channel_id in self.channels:
+                print(f'Target Channel : {channel_id}')
                 try:
                     # 채널에 메세지를 전송한다.
                     channel = self.bot.get_channel(channel_id)
@@ -43,6 +45,7 @@ class Remind(commands.Cog):
     # 작업 실행 전, 봇 실행이 완료될 때 까지 기다린다.
     @send_messages_to_channels.before_loop
     async def before_send_messages_to_channels(self):
+        print(f'{self.bot.user} await before send!')
         await self.bot.wait_until_ready()
 
     # Cog Listener, 준비가 완료되면 작업을 시작한다.
