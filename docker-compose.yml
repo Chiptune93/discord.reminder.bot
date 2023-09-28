@@ -1,8 +1,8 @@
 version: "3"
 
 services:
-  discord_bot:
-    image: remind_bot
+  app:
+    image: remind_bot:latest
     container_name: remind_bot
     restart: always
     ports:
