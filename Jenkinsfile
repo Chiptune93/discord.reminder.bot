@@ -6,7 +6,7 @@ pipeline {
         REMOTE_NAME = "PipelineRemoteServer"
         REMOTE_HOST =  "chiptune.iptime.org"
         REMOTE_CREDENTIAL_ID = "chiptune"
-        SOURCE_FILES = "Cogs/**/*, reminerbot.py, dockerfile, docker-compose.yml, requirement.txt"
+        SOURCE_FILES = "Cogs/**/*, main.py, dockerfile, docker-compose.yml, requirement.txt"
         REMOTE_DIRECTORY = "/service/remind_bot"
     }
 
