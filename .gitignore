@@ -1,5 +1,6 @@
 .env
 .idea
 .command
+.Jenkinsfile
 start.sh
 
