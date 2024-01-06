@@ -40,13 +40,14 @@ class Remind(commands.Cog):
         if (dt.hour >= 9 and dt.minute >= 0 and dt.second >= 0) and (
                 dt.hour < 22 and dt.minute <= 59 and dt.second <= 59):
 
+            print(f'Channels : {self.channels}')
             for channel_id in self.channels:
                 print(f'Target Channel : {channel_id}')
                 try:
                     # 채널에 메세지를 전송한다.
                     channel = self.bot.get_channel(channel_id)
                     # await channel.send(make_message(get_notion_data())) notion
-                    await channel.send(make_message(get_postgres_data()()))  # postgres in home
+                    await channel.send(make_message(get_postgres_data()))  # postgres in home
                 except Exception as e:
                     print(f"채널 ID {channel_id}를 찾을 수 없습니다.")
                     print(e)
