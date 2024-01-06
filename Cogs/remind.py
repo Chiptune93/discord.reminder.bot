@@ -6,9 +6,14 @@ import pytz
 import requests
 import random
 import ast
+# postgres
+import psycopg2
 
 # 채널 정보를 환경 변수에서 세팅 (스트링 배열 -> int 배열)
 target_channel = ast.literal_eval(os.getenv('DISCORD_REMIND_CHANNEL'))
+
+# 가져온 데이터 아이디 값 저장, 여기에 저장된 친구들은 초기화되기 전까지 다시 안가져옴.
+used_data_keys = []
 
 
 # Cog 클래스
@@ -17,6 +22,11 @@ class Remind(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.channels = target_channel  # 채널 ID 리스트로 변경
+
+    # 반복 작업 구문
+    @tasks.loop(hours=24)  # 매 24시간 마다 반복.
+    async def clear_used_data(self):
+        used_data_keys = []
 
     # 반복 작업 구문
     @tasks.loop(minutes=60)  # 매 1시간 마다 반복.
@@ -35,7 +45,8 @@ class Remind(commands.Cog):
                 try:
                     # 채널에 메세지를 전송한다.
                     channel = self.bot.get_channel(channel_id)
-                    await channel.send(make_message(get_notion_data()))
+                    # await channel.send(make_message(get_notion_data())) notion
+                    await channel.send(make_message(get_postgres_data()()))  # postgres in home
                 except Exception as e:
                     print(f"채널 ID {channel_id}를 찾을 수 없습니다.")
                     print(e)
@@ -87,6 +98,51 @@ def get_notion_data():
             'info': choice["properties"]["info"]["rich_text"][0]["text"]["content"]}
 
     return data
+
+
+def get_postgres_data():
+    try:
+        db = psycopg2.connect(host=os.getenv('POSTGRES_HOST')
+                              , dbname=os.getenv('POSTGRES_DB')
+                              , user=os.getenv('POSTGRES_ID')
+                              , password=os.getenv('POSTGRES_PASS')
+                              , port=os.getenv('POSTGRES_PORT'))
+    except Exception as e:
+        print("DB Connection Error!")
+
+    try:
+        cursor = db.cursor()
+
+        # 체크 로직에 의한 무한반복
+        while True:
+            # 랜덤으로 하나 가져오기!
+            sql = "select * from remind_contents order by random() limit 1"
+            cursor.execute(sql)
+            result = cursor.fetchone()
+
+            # 결과가 있는지 확인 후 출력
+            if result is not None:
+                # 인덱스를 이용하여 각 항목 선택
+                content_id = result[0]
+                title = result[1]
+                contents = result[2]
+                print(f"id: {content_id} title: {title}, contents: {contents}")
+            else:
+                print("결과가 없습니다.")
+                break;
+
+            # 이전에 가져온 데이터 인지 체크!
+            if content_id in used_data_keys:
+                # 결과가 이전에 사용됨. -> 다시 가져오기.
+                print(f"this id [{content_id}] is Used!")
+            else:
+                # 결과가 이전에 사용되지 않음 -> 기록하고, 그대로 보내기
+                used_data_keys.append(content_id)
+                # 해당 데이터를 파싱하여 리턴.
+                data = {'subject': title, 'info': contents}
+                return data
+    except Exception as e:
+        print(" insert DB  ", e)
 
 
 load_dotenv()

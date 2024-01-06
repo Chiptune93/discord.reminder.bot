@@ -7,9 +7,9 @@ name = "pypi"
 discord = "*"
 python-dotenv = "*"
 pytz = "*"
+requests = "*"
 
 [dev-packages]
 
 [requires]
 python_version = "3.9"
-python_full_version = "3.9.6"
