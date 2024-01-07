@@ -3,4 +3,4 @@ COPY . /app
 WORKDIR /app
 RUN pip3 install -r requirement.txt
 ENTRYPOINT ["python3"]
-CMD ["main.py"]
+CMD ["-u", "main.py"]

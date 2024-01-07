@@ -15,6 +15,10 @@ target_channel = ast.literal_eval(os.getenv('DISCORD_REMIND_CHANNEL'))
 # 가져온 데이터 아이디 값 저장, 여기에 저장된 친구들은 초기화되기 전까지 다시 안가져옴.
 used_data_keys = []
 
+# send condition
+is_time_ok = False
+is_test = False
+
 
 # Cog 클래스
 class Remind(commands.Cog):
@@ -29,16 +33,17 @@ class Remind(commands.Cog):
         used_data_keys = []
 
     # 반복 작업 구문
-    @tasks.loop(minutes=60)  # 매 1시간 마다 반복.
+    @tasks.loop(minutes=59)  # 매 1시간 마다 반복.
     async def send_messages_to_channels(self):
         # 날짜 체크.
         KST = pytz.timezone('Asia/Seoul')
         dt = datetime.now().astimezone(KST)
+        is_time_ok = (dt.hour >= 9 and dt.minute >= 0 and dt.second >= 0) and (dt.hour < 22 and dt.minute <= 59 and dt.second <= 59)
 
         # 오전 9시 ~ 오후 9시 사이에만 실행한다.
         print(f'현재 시간 : {dt} -> {dt.hour} : {dt.minute} : {dt.second}')
-        if (dt.hour >= 9 and dt.minute >= 0 and dt.second >= 0) and (
-                dt.hour < 22 and dt.minute <= 59 and dt.second <= 59):
+        print(f'send condition -> time: {is_time_ok} and test: {is_test}')
+        if is_time_ok and not is_test:
 
             print(f'Channels : {self.channels}')
             for channel_id in self.channels:
