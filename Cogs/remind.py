@@ -118,6 +118,12 @@ def get_postgres_data():
         password = os.getenv('POSTGRES_PASS')
         port = os.getenv('POSTGRES_PORT')
 
+        print(f'host : {host}'
+              f'dbname : {dbname}'
+              f'user : {user}'
+              f'password: {password}'
+              f'port: {port}')
+
         conn = psycopg2.connect(host=host, dbname=dbname, user=user, password=password, port=port)
         cursor = conn.cursor()
 
