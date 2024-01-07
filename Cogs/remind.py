@@ -108,6 +108,7 @@ def get_notion_data():
 
 def get_postgres_data():
     try:
+        global db
         db = psycopg2.connect(host=os.getenv('POSTGRES_HOST')
                               , dbname=os.getenv('POSTGRES_DB')
                               , user=os.getenv('POSTGRES_ID')
