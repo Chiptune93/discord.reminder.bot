@@ -19,6 +19,9 @@ used_data_keys = []
 is_time_ok = False
 is_test = False
 
+# postgres conn variable
+conn = None
+
 
 # Cog 클래스
 class Remind(commands.Cog):
