@@ -42,7 +42,7 @@ class Remind(commands.Cog):
         KST = pytz.timezone('Asia/Seoul')
         dt = datetime.now().astimezone(KST)
         is_time_ok = (dt.hour >= 9 and dt.minute >= 0 and dt.second >= 0) and (
-                    dt.hour < 22 and dt.minute <= 59 and dt.second <= 59)
+                dt.hour < 22 and dt.minute <= 59 and dt.second <= 59)
 
         # 오전 9시 ~ 오후 9시 사이에만 실행한다.
         print(f'현재 시간 : {dt} -> {dt.hour} : {dt.minute} : {dt.second}')
@@ -112,12 +112,13 @@ def get_notion_data():
 
 def get_postgres_data():
     try:
-        conn = psycopg2.connect(host=os.getenv('POSTGRES_HOST')
-                                , dbname=os.getenv('POSTGRES_DB')
-                                , user=os.getenv('POSTGRES_ID')
-                                , password=os.getenv('POSTGRES_PASS')
-                                , port=os.getenv('POSTGRES_PORT'))
+        host = os.getenv('POSTGRES_HOST')
+        dbname = os.getenv('POSTGRES_DB')
+        user = os.getenv('POSTGRES_ID')
+        password = os.getenv('POSTGRES_PASS')
+        port = os.getenv('POSTGRES_PORT')
 
+        conn = psycopg2.connect(host=host, dbname=dbname, user=user, password=password, port=port)
         cursor = conn.cursor()
 
         # 체크 로직에 의한 무한반복
@@ -150,5 +151,6 @@ def get_postgres_data():
                 return data
     except Exception as e:
         print("get_postgres_data error : ", e)
+
 
 load_dotenv()
