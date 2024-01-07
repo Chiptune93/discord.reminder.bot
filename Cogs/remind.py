@@ -108,8 +108,7 @@ def get_notion_data():
 
 def get_postgres_data():
     try:
-        global db
-        db = psycopg2.connect(host=os.getenv('POSTGRES_HOST')
+        conn = psycopg2.connect(host=os.getenv('POSTGRES_HOST')
                               , dbname=os.getenv('POSTGRES_DB')
                               , user=os.getenv('POSTGRES_ID')
                               , password=os.getenv('POSTGRES_PASS')
@@ -118,7 +117,7 @@ def get_postgres_data():
         print("DB Connection Error!")
 
     try:
-        cursor = db.cursor()
+        cursor = conn.cursor()
 
         # 체크 로직에 의한 무한반복
         while True:
