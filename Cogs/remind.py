@@ -45,34 +45,28 @@ class Remind(commands.Cog):
                 dt.hour < 22 and dt.minute <= 59 and dt.second <= 59)
 
         # 오전 9시 ~ 오후 9시 사이에만 실행한다.
-        print(f'현재 시간 : {dt} -> {dt.hour} : {dt.minute} : {dt.second}')
-        print(f'send condition -> time: {is_time_ok} and test: {is_test}')
+        # print(f'현재 시간 : {dt} -> {dt.hour} : {dt.minute} : {dt.second}')
+        # print(f'send condition -> time: {is_time_ok} and test: {is_test}')
         if is_time_ok and not is_test:
-
-            print(f'Channels : {self.channels}')
             for channel_id in self.channels:
-                print(f'Target Channel : {channel_id}')
                 try:
                     # 채널에 메세지를 전송한다.
                     channel = self.bot.get_channel(channel_id)
                     # await channel.send(make_message(get_notion_data())) notion
                     await channel.send(make_message(get_postgres_data()))  # postgres in home
                 except Exception as e:
-                    print(f"채널 ID {channel_id}를 찾을 수 없습니다.")
                     print(e)
-        else:
-            print('Remind 시간이 아닙니다.')
 
     # 작업 실행 전, 봇 실행이 완료될 때 까지 기다린다.
     @send_messages_to_channels.before_loop
     async def before_send_messages_to_channels(self):
-        print(f'{self.bot.user} await before send!')
+        # print(f'{self.bot.user} await before send!')
         await self.bot.wait_until_ready()
 
     # Cog Listener, 준비가 완료되면 작업을 시작한다.
     @commands.Cog.listener()
     async def on_ready(self):
-        print(f'{self.bot.user} has connected to Discord!')
+        # print(f'{self.bot.user} has connected to Discord!')
         self.send_messages_to_channels.start()
 
     def cog_unload(self):
@@ -88,7 +82,6 @@ async def setup(app):
 def make_message(row):
     message = '**# ' + row['subject'] + '**'
     message += '\n>>> ' + row['info'] + '\n\n'
-    print(message)
     return message
 
 
@@ -118,12 +111,6 @@ def get_postgres_data():
         password = os.getenv('POSTGRES_PASS')
         port = os.getenv('POSTGRES_PORT')
 
-        print(f'host : {host}'
-              f'dbname : {dbname}'
-              f'user : {user}'
-              f'password: {password}'
-              f'port: {port}')
-
         conn = psycopg2.connect(host=host, dbname=dbname, user=user, password=password, port=port)
         cursor = conn.cursor()
 
@@ -140,21 +127,19 @@ def get_postgres_data():
                 content_id = result[0]
                 title = result[1]
                 contents = result[2]
-                print(f"id: {content_id} title: {title}, contents: {contents}")
             else:
-                print("결과가 없습니다.")
-                break;
+                # print("결과가 없습니다.")
+                break
 
-            # 이전에 가져온 데이터 인지 체크!
-            if content_id in used_data_keys:
-                # 결과가 이전에 사용됨. -> 다시 가져오기.
-                print(f"this id [{content_id}] is Used!")
-            else:
+            # 결과가 이전에 사용됨. -> 다시 가져오기.
+            # print(f"this id [{content_id}] is Used!")
+            if content_id not in used_data_keys:
                 # 결과가 이전에 사용되지 않음 -> 기록하고, 그대로 보내기
                 used_data_keys.append(content_id)
                 # 해당 데이터를 파싱하여 리턴.
                 data = {'subject': title, 'info': contents}
                 return data
+            # 이전에 가져온 데이터 인지 체크!
     except Exception as e:
         print("get_postgres_data error : ", e)
 
